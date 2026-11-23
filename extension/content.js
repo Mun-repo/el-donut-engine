@@ -5,6 +5,7 @@
 (() => {
   'use strict';
   const EXT_ORIGIN = new URL(chrome.runtime.getURL('')).origin;
+  const ALLOWED = p => p.startsWith('/play/computer');
 
   let frame = null;
   let ready = false;
@@ -210,6 +211,7 @@
 
   // ---------- Loop ----------
   function tick() {
+    if (!ALLOWED(location.pathname)) { if (frame) unmount(); return; }
     mount();
     if (!ready || settings.mode === 'off') { clearHL(); return; }
     const pos = readPosition();
