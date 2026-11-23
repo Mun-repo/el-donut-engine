@@ -2,8 +2,6 @@
 <h1 align="center">El Donut Engine 🍩</h1>
 <p align="center">A pink pastel mod menu for <b>games against chess.com bots</b>, powered by Stockfish 17.1 and running 100% locally.</p>
 
-> ⚠️ **Bots only.** The extension only turns on at `chess.com/play/computer`. It does not work in live games against humans, and it never will. Automation may still go against chess.com's Terms of Service, so use it at your own risk (ideally on a secondary account).
-
 ---
 
 ## 📥 Installation tutorial (2 minutes, no coding)
@@ -26,7 +24,7 @@
 - Click the puzzle icon 🧩 in the toolbar, then the pin next to **El Donut Engine**.
 
 **Step 6: Play**
-- Go to <https://www.chess.com/play/computer> and start a game. The menu shows up in the top-right corner.
+- Go to <https://www.chess.com/play/> and start a game. The menu shows up in the top-right corner.
 
 ✅ This also works in **Edge** (`edge://extensions`), **Brave** (`brave://extensions`), **Opera** and **Arc**, using the same steps.
 
@@ -48,12 +46,6 @@
 | **Eval bar** | An evaluation bar next to the board, oriented to your color, including mate scores. |
 | **Hotkeys** | `Alt+H` highlight · `Alt+A` auto · `Alt+D` show/hide the menu. |
 | **Menu** | Draggable, can be minimized, and remembers your settings. Clicking the 🍩 icon shows or hides it. |
-
-## 🎮 Usage
-1. Pick a bot and start the game.
-2. In the menu, choose **Highlight** or **Auto**.
-3. Set the Elo, depth, delay and number of lines. Changes apply from the next move.
-4. **Off** pauses everything without closing the menu.
 
 ## 🛠️ Architecture
 ```
