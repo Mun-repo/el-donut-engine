@@ -1,19 +1,50 @@
 {
   "manifest_version": 3,
   "name": "El Donut Engine",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "Pink pastel Stockfish assistant for games against chess.com bots. Runs 100% locally.",
-  "icons": { "16": "icons/16.png", "48": "icons/48.png", "128": "icons/128.png" },
-  "action": { "default_title": "El Donut Engine", "default_icon": { "16": "icons/16.png", "48": "icons/48.png" } },
-  "background": { "service_worker": "background.js" },
-  "content_scripts": [{
-    "matches": ["https://www.chess.com/*"],
-    "js": ["content.js"],
-    "css": ["content.css"],
-    "run_at": "document_idle"
-  }],
-  "web_accessible_resources": [{
-    "resources": ["panel.html", "panel.css", "panel.js", "engine/*", "icons/*"],
-    "matches": ["https://www.chess.com/*"]
-  }]
+  "icons": {
+    "16": "icons/16.png",
+    "48": "icons/48.png",
+    "128": "icons/128.png"
+  },
+  "action": {
+    "default_title": "El Donut Engine",
+    "default_icon": {
+      "16": "icons/16.png",
+      "48": "icons/48.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.chess.com/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "css": [
+        "content.css"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "panel.html",
+        "panel.css",
+        "panel.js",
+        "engine/*",
+        "icons/*",
+        "fonts/*"
+      ],
+      "matches": [
+        "https://www.chess.com/*"
+      ]
+    }
+  ]
 }

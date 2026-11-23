@@ -24,7 +24,7 @@ engine.onmessage = ({ data: l }) => {
     const best = l.split(' ')[1];
     $('best').textContent = best; $('eval').textContent = fmtEval(info.eval, current);
     const pvs = (info.pvs || []).filter(Boolean).slice(0, S.lines);
-    $('lines').innerHTML = pvs.map((v, i) => `<li><span>${i + 1}</span><b>${v.move}</b><em>${v.eval}</em></li>`).join('');
+    $('lines').innerHTML = pvs.length ? pvs.map((v, i) => `<li><span>${i + 1}</span><b>${v.move}</b><em>${v.eval}</em></li>`).join('') : '<li class="empty">No legal moves</li>';
     parent.postMessage({ type: 'best', fen: current, best, pvs, eval: fmtEval(info.eval, current) }, PARENT);
   }
 };
@@ -51,9 +51,10 @@ window.addEventListener('message', e => {
 });
 
 // ---------- UI ----------
-const status = () => $('status').textContent = engineOk
-  ? ({ off: 'Paused', highlight: 'Highlighting', auto: 'Auto-play' })[S.mode]
-  : 'Loading engine…';
+const status = () => {
+  $('status').textContent = engineOk ? ({ off: 'Ready · paused', highlight: 'Showing hints', auto: 'Auto-playing' })[S.mode] : 'Loading engine…';
+  $('dot').className = 'dot' + (engineOk ? (S.mode === 'off' ? ' ok' : ' live') : '');
+};
 function render() {
   document.querySelectorAll('#mode button').forEach(b => b.classList.toggle('on', b.dataset.v === S.mode));
   for (const k of ['elo', 'delay', 'depth', 'linesR']) {
@@ -66,6 +67,7 @@ function render() {
   $('linesV').textContent = S.lines;
   $('arrows').checked = S.arrows; $('evalbar').checked = S.evalbar;
   $('jitter').checked = S.jitter;
+  document.querySelectorAll('.presets button').forEach(b => b.classList.toggle('on', +b.dataset.elo === S.elo));
   status();
 }
 function push() { parent.postMessage({ type: 'settings', settings: S }, PARENT); }
@@ -79,10 +81,17 @@ for (const k of ['elo', 'delay', 'depth', 'linesR']) $(k).oninput = e => set({ [
 for (const k of ['jitter', 'arrows', 'evalbar']) $(k).onchange = e => set({ [k]: e.target.checked });
 window.addEventListener('message', e => { if (e.origin === PARENT && e.data?.type === 'hotkey') set({ mode: S.mode === e.data.mode ? 'off' : e.data.mode }); });
 
+document.querySelectorAll('.presets button').forEach(b => b.onclick = () => set({ elo: +b.dataset.elo }));
+document.querySelectorAll('.tabs button').forEach(t => t.onclick = () => {
+  document.querySelectorAll('.tabs button').forEach(x => x.classList.toggle('on', x === t));
+  document.querySelectorAll('.view').forEach(v => v.classList.toggle('on', v.dataset.view === t.dataset.tab));
+});
+$('reset').onclick = () => set({ ...DEF });
+$('ver').textContent = chrome.runtime.getManifest().version;
 let min = false;
-$('min').onclick = () => { min = !min; $('min').textContent = min ? '+' : '–'; parent.postMessage({ type: 'minimize', min }, PARENT); };
+$('min').onclick = () => { min = !min; parent.postMessage({ type: 'minimize', min }, PARENT); };
 let drag = null;
-$('drag').onpointerdown = e => { if (e.target.id === 'min') return; drag = { x: e.screenX, y: e.screenY }; $('drag').setPointerCapture(e.pointerId); };
+$('drag').onpointerdown = e => { if (e.target.closest('#min')) return; drag = { x: e.screenX, y: e.screenY }; $('drag').setPointerCapture(e.pointerId); };
 $('drag').onpointermove = e => {
   if (!drag) return;
   parent.postMessage({ type: 'drag', dx: e.screenX - drag.x, dy: e.screenY - drag.y }, PARENT);

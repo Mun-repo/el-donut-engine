@@ -1,6 +1,6 @@
 <p align="center"><img src="extension/icons/512.png" width="140"></p>
 <h1 align="center">El Donut Engine 🍩</h1>
-<p align="center">A pink pastel mod menu for <b>games against chess.com bots</b>, powered by Stockfish 17.1 and running 100% locally.</p>
+<p align="center">A refined dark mod menu with dusty-rose accents for <b>games against chess.com bots</b>, powered by Stockfish 17.1 and running 100% locally.</p>
 
 ---
 
@@ -45,7 +45,7 @@
 | **Arrows** | Pink gradient arrows on the board. The darkest one is the best move. |
 | **Eval bar** | An evaluation bar next to the board, oriented to your color, including mate scores. |
 | **Hotkeys** | `Alt+H` highlight · `Alt+A` auto · `Alt+D` show/hide the menu. |
-| **Menu** | Draggable, can be minimized, and remembers your settings. Clicking the 🍩 icon shows or hides it. |
+| **Menu** | 4 tabs (Play, Engine, Display, About), Inter + JetBrains Mono fonts, Elo presets. Draggable, can be minimized, and remembers your settings. Clicking the 🍩 icon shows or hides it. |
 
 ## 🛠️ Architecture
 ```

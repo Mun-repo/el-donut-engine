@@ -1,36 +1,99 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><link rel="stylesheet" href="panel.css"></head>
 <body>
-<div class="card">
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M6 4l14 8-14 8z"/></symbol>
+  <symbol id="i-cpu" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></symbol>
+  <symbol id="i-off" viewBox="0 0 24 24"><path d="M12 3v8"/><path d="M6.3 7.5a8 8 0 1 0 11.4 0"/></symbol>
+  <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></symbol>
+  <symbol id="i-min" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+  <symbol id="i-reset" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></symbol>
+</svg>
+
+<div class="app">
   <header id="drag">
     <img src="icons/128.png" alt="">
-    <div><h1>El Donut Engine</h1><p id="status">Loading engine…</p></div>
-    <button id="min" title="Minimize">–</button>
+    <div class="title"><h1>El Donut Engine</h1><p><span class="dot" id="dot"></span><span id="status">Loading engine…</span></p></div>
+    <button class="icon-btn" id="min" title="Minimize"><svg><use href="#i-min"/></svg></button>
   </header>
-  <main>
-    <div class="seg" id="mode">
-      <button data-v="off">Off</button>
-      <button data-v="highlight">Highlight</button>
-      <button data-v="auto">Auto</button>
-    </div>
-    <label class="row"><span>Engine Elo</span><b id="eloV"></b></label>
-    <input type="range" id="elo" min="1320" max="3190" step="10">
-    <label class="row"><span>Move delay (auto)</span><b id="delayV"></b></label>
-    <input type="range" id="delay" min="0" max="10000" step="100">
-    <label class="row"><span>Depth</span><b id="depthV"></b></label>
-    <input type="range" id="depth" min="4" max="22" step="1">
-    <label class="row"><span>Lines</span><b id="linesV"></b></label>
-    <input type="range" id="linesR" min="1" max="3" step="1">
-    <div class="checks">
-      <label class="toggle"><input type="checkbox" id="jitter"><i></i><span>Human delay</span></label>
-      <label class="toggle"><input type="checkbox" id="arrows"><i></i><span>Arrows</span></label>
-      <label class="toggle"><input type="checkbox" id="evalbar"><i></i><span>Eval bar</span></label>
-    </div>
-    <div class="out"><div><small>Best move</small><b id="best">—</b></div><div><small>Eval</small><b id="eval">—</b></div><div><small>Depth</small><b id="dep">—</b></div></div>
-    <ol id="lines"></ol>
-    <p class="keys">Alt+H highlight · Alt+A auto · Alt+D menu</p>
-  </main>
-  <footer>Bots only · Stockfish 17.1 · 🍩</footer>
+
+  <div class="views">
+    <!-- PLAY -->
+    <section class="view on" data-view="play">
+      <div class="seg" id="mode">
+        <button data-v="off"><svg><use href="#i-off"/></svg>Off</button>
+        <button data-v="highlight"><svg><use href="#i-target"/></svg>Hint</button>
+        <button data-v="auto"><svg><use href="#i-bolt"/></svg>Auto</button>
+      </div>
+
+      <div class="hero">
+        <div><small>Best move</small><b class="mono" id="best">—</b></div>
+        <div class="split">
+          <div><small>Eval</small><b class="mono" id="eval">—</b></div>
+          <div><small>Depth</small><b class="mono" id="dep">—</b></div>
+        </div>
+      </div>
+
+      <h2>Top lines</h2>
+      <ol id="lines"><li class="empty">Waiting for your turn…</li></ol>
+
+      <div class="field">
+        <div class="lbl"><span>Move delay</span><b id="delayV"></b></div>
+        <input type="range" id="delay" min="0" max="10000" step="100">
+      </div>
+    </section>
+
+    <!-- ENGINE -->
+    <section class="view" data-view="engine">
+      <div class="field">
+        <div class="lbl"><span>Strength</span><b id="eloV"></b></div>
+        <input type="range" id="elo" min="1320" max="3190" step="10">
+        <div class="presets">
+          <button data-elo="1400">Casual</button><button data-elo="1900">Club</button>
+          <button data-elo="2500">Master</button><button data-elo="3190">Max</button>
+        </div>
+      </div>
+      <div class="field">
+        <div class="lbl"><span>Search depth</span><b id="depthV"></b></div>
+        <input type="range" id="depth" min="4" max="22" step="1">
+        <p class="hint">Higher depth plays stronger but takes longer.</p>
+      </div>
+      <div class="field">
+        <div class="lbl"><span>Lines analysed</span><b id="linesV"></b></div>
+        <input type="range" id="linesR" min="1" max="3" step="1">
+      </div>
+      <div class="engine-card"><span>Stockfish 17.1</span><em>WASM · single-thread · offline</em></div>
+    </section>
+
+    <!-- DISPLAY -->
+    <section class="view" data-view="display">
+      <label class="opt"><div><b>Arrows</b><span>Draw the best moves on the board</span></div><input type="checkbox" id="arrows"><i></i></label>
+      <label class="opt"><div><b>Evaluation bar</b><span>Shown beside the board</span></div><input type="checkbox" id="evalbar"><i></i></label>
+      <label class="opt"><div><b>Human timing</b><span>Randomise the auto delay by ±30%</span></div><input type="checkbox" id="jitter"><i></i></label>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="view" data-view="about">
+      <h2>Shortcuts</h2>
+      <ul class="keys">
+        <li><span>Toggle hints</span><kbd>Alt</kbd><kbd>H</kbd></li>
+        <li><span>Toggle auto-play</span><kbd>Alt</kbd><kbd>A</kbd></li>
+        <li><span>Show / hide menu</span><kbd>Alt</kbd><kbd>D</kbd></li>
+      </ul>
+      <button class="ghost" id="reset"><svg><use href="#i-reset"/></svg>Reset settings</button>
+      <p class="foot">Version <span id="ver"></span> · Works against chess.com bots only.</p>
+    </section>
+  </div>
+
+  <nav class="tabs">
+    <button data-tab="play" class="on"><svg><use href="#i-play"/></svg>Play</button>
+    <button data-tab="engine"><svg><use href="#i-cpu"/></svg>Engine</button>
+    <button data-tab="display"><svg><use href="#i-eye"/></svg>Display</button>
+    <button data-tab="about"><svg><use href="#i-info"/></svg>About</button>
+  </nav>
 </div>
 <script src="panel.js"></script>
 </body></html>

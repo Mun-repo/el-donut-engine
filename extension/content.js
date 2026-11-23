@@ -45,7 +45,7 @@
       frame.style.top = Math.max(0, Math.min(innerHeight - 40, r.top + m.dy)) + 'px';
       frame.style.right = 'auto';
     }
-    else if (m.type === 'minimize') frame.style.height = m.min ? '64px' : '590px';
+    else if (m.type === 'minimize') frame.style.height = m.min ? '64px' : '560px';
   });
 
   chrome.runtime.onMessage.addListener(m => {
@@ -125,7 +125,7 @@
     });
   }
 
-  const COLORS = ['#ff5fa2', '#ff9cc6', '#ffc9df'];
+  const COLORS = ['#d9a3b8', '#b8a3d9', '#a3c4d9'];
   function arrows(b, pvs) {
     const R = b.getBoundingClientRect(), s = R.width / 8;
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -141,8 +141,8 @@
       const g = document.createElementNS(svg.namespaceURI, 'path');
       g.setAttribute('d', `M0 ${-w / 2} L${len - hl} ${-w / 2} L${len - hl} ${-hw / 2} L${len} 0 L${len - hl} ${hw / 2} L${len - hl} ${w / 2} L0 ${w / 2} Z`);
       g.setAttribute('transform', `translate(${x1} ${y1}) rotate(${ang * 180 / Math.PI})`);
-      g.setAttribute('fill', COLORS[i]); g.setAttribute('opacity', i ? '.7' : '.9');
-      g.setAttribute('stroke', '#fff'); g.setAttribute('stroke-width', '1.5');
+      g.setAttribute('fill', COLORS[i]); g.setAttribute('opacity', i ? '.55' : '.85');
+      
       svg.appendChild(g);
     });
     b.appendChild(svg); hl.push(svg);
