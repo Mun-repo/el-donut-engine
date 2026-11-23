@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "El Donut Engine",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Assistant Stockfish rose pastel pour les parties contre les bots de chess.com (hors ligne, jamais en live).",
   "icons": { "16": "icons/16.png", "48": "icons/48.png", "128": "icons/128.png" },
   "action": { "default_title": "El Donut Engine", "default_icon": { "16": "icons/16.png", "48": "icons/48.png" } },
