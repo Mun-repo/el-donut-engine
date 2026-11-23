@@ -1,6 +1,12 @@
-#ede-frame{position:fixed;top:90px;right:24px;width:300px;height:470px;border:0;z-index:2147483646;border-radius:22px;box-shadow:0 18px 50px rgba(255,120,170,.35);background:transparent;transition:opacity .2s,transform .2s}
+#ede-frame{position:fixed;top:90px;right:24px;width:300px;height:590px;border:0;z-index:2147483646;border-radius:14px;box-shadow:0 18px 50px rgba(255,120,170,.35);background:transparent;transition:opacity .2s,transform .2s}
 #ede-frame.ede-hidden{opacity:0;transform:translateY(-8px) scale(.97);pointer-events:none}
 .ede-hl{position:absolute;pointer-events:none;z-index:50;border-radius:6px;box-sizing:border-box}
 .ede-from{background:rgba(255,182,213,.55);box-shadow:inset 0 0 0 3px #ff8fbf}
 .ede-to{background:rgba(255,143,191,.7);box-shadow:inset 0 0 0 3px #ff5fa2}
 .ede-to::after{content:"🍩";position:absolute;inset:0;display:grid;place-items:center;font-size:28%;font-size:min(3vw,26px);opacity:.9}
+
+.ede-arrows{border-radius:0;z-index:51}
+.ede-bar{position:absolute;width:12px;background:#5a3a4a;border:2px solid #ffb6d5;border-radius:3px;overflow:hidden;z-index:40;display:flex;flex-direction:column-reverse}
+.ede-bar.ede-flip{flex-direction:column}
+.ede-fill{background:#fff;width:100%;transition:height .4s ease}
+.ede-bar span{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-90deg);font:700 9px system-ui;color:#ff5fa2;white-space:nowrap;mix-blend-mode:difference}

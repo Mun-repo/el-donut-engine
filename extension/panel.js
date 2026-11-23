@@ -1,7 +1,7 @@
 // El Donut Engine — menu + moteur Stockfish (tourne dans l'iframe de l'extension)
 const PARENT = 'https://www.chess.com';
 const $ = id => document.getElementById(id);
-const DEF = { mode: 'off', delay: 1500, jitter: true, elo: 2000, depth: 14 };
+const DEF = { mode: 'off', delay: 1500, jitter: true, elo: 2000, depth: 14, lines: 1, arrows: true, evalbar: true };
 let S = { ...DEF }, engineOk = false, current = null, info = {};
 
 const engine = new Worker('engine/stockfish.js');
@@ -14,12 +14,18 @@ engine.onmessage = ({ data: l }) => {
   }
   else if (l.startsWith('info') && l.includes(' pv ')) {
     const cp = l.match(/score cp (-?\d+)/), mate = l.match(/score mate (-?\d+)/);
-    info.eval = mate ? `M${mate[1]}` : cp ? (cp[1] / 100).toFixed(2) : info.eval;
+    const n = +(l.match(/multipv (\d+)/) || [0, 1])[1];
+    const ev = mate ? `M${mate[1]}` : cp ? (cp[1] / 100).toFixed(2) : null;
+    const mv = l.split(' pv ')[1].split(' ')[0];
+    if (ev) { info.pvs = info.pvs || []; info.pvs[n - 1] = { move: mv, eval: fmtEval(ev, current) }; if (n === 1) info.eval = ev; }
+    const d = l.match(/ depth (\d+)/); if (d && n === 1) $('dep').textContent = d[1];
   }
   else if (l.startsWith('bestmove') && current) {
     const best = l.split(' ')[1];
     $('best').textContent = best; $('eval').textContent = fmtEval(info.eval, current);
-    parent.postMessage({ type: 'best', fen: current, best }, PARENT);
+    const pvs = (info.pvs || []).filter(Boolean).slice(0, S.lines);
+    $('lines').innerHTML = pvs.map((v, i) => `<li><span>${i + 1}</span><b>${v.move}</b><em>${v.eval}</em></li>`).join('');
+    parent.postMessage({ type: 'best', fen: current, best, pvs, eval: fmtEval(info.eval, current) }, PARENT);
   }
 };
 function fmtEval(e, fen) {
@@ -31,6 +37,7 @@ function fmtEval(e, fen) {
 function applyEngine() {
   uci('setoption name UCI_LimitStrength value ' + (S.elo < 3190));
   uci('setoption name UCI_Elo value ' + S.elo);
+  uci('setoption name MultiPV value ' + S.lines);
 }
 uci('uci');
 
@@ -49,25 +56,28 @@ const status = () => $('status').textContent = engineOk
   : 'Chargement du moteur…';
 function render() {
   document.querySelectorAll('#mode button').forEach(b => b.classList.toggle('on', b.dataset.v === S.mode));
-  for (const k of ['elo', 'delay', 'depth']) {
-    const el = $(k); el.value = S[k];
-    el.style.setProperty('--p', ((S[k] - el.min) / (el.max - el.min) * 100) + '%');
+  for (const k of ['elo', 'delay', 'depth', 'linesR']) {
+    const el = $(k), v = S[k === 'linesR' ? 'lines' : k]; el.value = v;
+    el.style.setProperty('--p', ((v - el.min) / (el.max - el.min) * 100) + '%');
   }
   $('eloV').textContent = S.elo >= 3190 ? 'Max' : S.elo;
   $('delayV').textContent = (S.delay / 1000).toFixed(1) + ' s';
   $('depthV').textContent = S.depth;
+  $('linesV').textContent = S.lines;
+  $('arrows').checked = S.arrows; $('evalbar').checked = S.evalbar;
   $('jitter').checked = S.jitter;
   status();
 }
 function push() { parent.postMessage({ type: 'settings', settings: S }, PARENT); }
 function set(patch) {
   S = { ...S, ...patch }; render(); chrome.storage.local.set({ ede: S });
-  if ('elo' in patch && engineOk) applyEngine();
+  if (('elo' in patch || 'lines' in patch) && engineOk) applyEngine();
   push();
 }
 document.querySelectorAll('#mode button').forEach(b => b.onclick = () => set({ mode: b.dataset.v }));
-for (const k of ['elo', 'delay', 'depth']) $(k).oninput = e => set({ [k]: +e.target.value });
-$('jitter').onchange = e => set({ jitter: e.target.checked });
+for (const k of ['elo', 'delay', 'depth', 'linesR']) $(k).oninput = e => set({ [k === 'linesR' ? 'lines' : k]: +e.target.value });
+for (const k of ['jitter', 'arrows', 'evalbar']) $(k).onchange = e => set({ [k]: e.target.checked });
+window.addEventListener('message', e => { if (e.origin === PARENT && e.data?.type === 'hotkey') set({ mode: S.mode === e.data.mode ? 'off' : e.data.mode }); });
 
 let min = false;
 $('min').onclick = () => { min = !min; $('min').textContent = min ? '+' : '–'; parent.postMessage({ type: 'minimize', min }, PARENT); };

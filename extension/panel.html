@@ -19,8 +19,16 @@
     <input type="range" id="delay" min="0" max="10000" step="100">
     <label class="row"><span>Profondeur</span><b id="depthV"></b></label>
     <input type="range" id="depth" min="4" max="22" step="1">
-    <label class="toggle"><input type="checkbox" id="jitter"><i></i><span>Délai aléatoire ±30 %</span></label>
-    <div class="out"><div><small>Meilleur coup</small><b id="best">—</b></div><div><small>Éval</small><b id="eval">—</b></div></div>
+    <label class="row"><span>Lignes analysées</span><b id="linesV"></b></label>
+    <input type="range" id="linesR" min="1" max="3" step="1">
+    <div class="checks">
+      <label class="toggle"><input type="checkbox" id="jitter"><i></i><span>Délai humain</span></label>
+      <label class="toggle"><input type="checkbox" id="arrows"><i></i><span>Flèches</span></label>
+      <label class="toggle"><input type="checkbox" id="evalbar"><i></i><span>Barre d'éval</span></label>
+    </div>
+    <div class="out"><div><small>Meilleur coup</small><b id="best">—</b></div><div><small>Éval</small><b id="eval">—</b></div><div><small>Prof.</small><b id="dep">—</b></div></div>
+    <ol id="lines"></ol>
+    <p class="keys">Alt+H surligner · Alt+A auto · Alt+D menu</p>
   </main>
   <footer>Bots uniquement · Stockfish 17.1 · 🍩</footer>
 </div>

@@ -9,7 +9,8 @@
 
   let frame = null;
   let ready = false;
-  let settings = { mode: 'off', delay: 1500, jitter: true, elo: 2000, depth: 14 };
+  let settings = { mode: 'off', delay: 1500, jitter: true, elo: 2000, depth: 14, lines: 1, arrows: true, evalbar: true };
+  let bar = null;
   let lastFen = '';
   let pending = null;   // { fen, best }
   let playTimer = null;
@@ -25,7 +26,7 @@
     document.documentElement.appendChild(frame);
   }
   function unmount() {
-    clearHL(); clearTimeout(playTimer);
+    clearHL(); clearTimeout(playTimer); bar?.remove(); bar = null;
     frame?.remove(); frame = null; ready = false; lastFen = '';
   }
   const send = msg => frame?.contentWindow?.postMessage(msg, EXT_ORIGIN);
@@ -45,7 +46,7 @@
       frame.style.top = Math.max(0, Math.min(innerHeight - 40, r.top + m.dy)) + 'px';
       frame.style.right = 'auto';
     }
-    else if (m.type === 'minimize') frame.style.height = m.min ? '64px' : '470px';
+    else if (m.type === 'minimize') frame.style.height = m.min ? '64px' : '590px';
   });
 
   chrome.runtime.onMessage.addListener(m => {
@@ -125,6 +126,46 @@
     });
   }
 
+  const COLORS = ['#ff5fa2', '#ff9cc6', '#ffc9df'];
+  function arrows(b, pvs) {
+    const R = b.getBoundingClientRect(), s = R.width / 8;
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('class', 'ede-hl ede-arrows');
+    svg.setAttribute('viewBox', `0 0 ${R.width} ${R.width}`);
+    Object.assign(svg.style, { left: 0, top: 0, width: R.width + 'px', height: R.width + 'px' });
+    pvs.slice().reverse().forEach((v, ri) => {
+      const i = pvs.length - 1 - ri, { from, to } = parseUci(v.move);
+      const a = sqRect(b, ...from), z = sqRect(b, ...to);
+      const x1 = a.x + s / 2, y1 = a.y + s / 2, x2 = z.x + s / 2, y2 = z.y + s / 2;
+      const ang = Math.atan2(y2 - y1, x2 - x1), len = Math.hypot(x2 - x1, y2 - y1) - s * 0.3;
+      const w = s * (i ? 0.13 : 0.18), hw = w * 2.2, hl = w * 2.4;
+      const g = document.createElementNS(svg.namespaceURI, 'path');
+      g.setAttribute('d', `M0 ${-w / 2} L${len - hl} ${-w / 2} L${len - hl} ${-hw / 2} L${len} 0 L${len - hl} ${hw / 2} L${len - hl} ${w / 2} L0 ${w / 2} Z`);
+      g.setAttribute('transform', `translate(${x1} ${y1}) rotate(${ang * 180 / Math.PI})`);
+      g.setAttribute('fill', COLORS[i]); g.setAttribute('opacity', i ? '.7' : '.9');
+      g.setAttribute('stroke', '#fff'); g.setAttribute('stroke-width', '1.5');
+      svg.appendChild(g);
+    });
+    b.appendChild(svg); hl.push(svg);
+  }
+  function evalBar(b, ev) {
+    if (!settings.evalbar) { bar?.remove(); bar = null; return; }
+    if (!bar || !bar.isConnected) {
+      bar = document.createElement('div'); bar.className = 'ede-bar';
+      bar.innerHTML = '<div class="ede-fill"></div><span></span>';
+      b.parentElement.appendChild(bar);
+    }
+    const R = b.getBoundingClientRect(), P = b.parentElement.getBoundingClientRect();
+    Object.assign(bar.style, { left: (R.left - P.left - 18) + 'px', top: (R.top - P.top) + 'px', height: R.height + 'px' });
+    let pct = 50;
+    if (ev?.startsWith('M')) pct = ev.includes('-') ? 0 : 100;
+    else if (ev && ev !== '—') pct = 50 + 50 * (2 / (1 + Math.exp(-0.4 * parseFloat(ev))) - 1);
+    if (b.classList.contains('flipped')) pct = 100 - pct;
+    bar.firstChild.style.height = pct + '%';
+    bar.classList.toggle('ede-flip', b.classList.contains('flipped'));
+    bar.lastChild.textContent = ev || '';
+  }
+
   function tap(b, x, y) {
     const o = { bubbles: true, cancelable: true, composed: true, clientX: x, clientY: y, button: 0, pointerId: 1, pointerType: 'mouse', isPrimary: true };
     const t = document.elementFromPoint(x, y) || b;
@@ -148,12 +189,17 @@
     }, 60);
   }
 
-  function onBest({ fen, best }) {
+  function show(b, best, pvs) {
+    highlight(b, best);
+    if (settings.arrows && pvs?.length) arrows(b, pvs);
+  }
+  function onBest({ fen, best, pvs, eval: ev }) {
     if (fen !== lastFen || !best || best === '(none)') return;
     const b = board(); if (!b) return;
-    if (settings.mode === 'highlight') highlight(b, best);
+    evalBar(b, ev);
+    if (settings.mode === 'highlight') show(b, best, pvs);
     else if (settings.mode === 'auto') {
-      highlight(b, best);
+      show(b, best, pvs);
       const jitter = settings.jitter ? (Math.random() * 0.6 - 0.3) * settings.delay : 0;
       clearTimeout(playTimer);
       playTimer = setTimeout(() => {
@@ -177,4 +223,14 @@
     send({ type: 'analyse', fen: pos.fen });
   }
   setInterval(tick, 250);
+
+  // Raccourcis : Alt+H surligner, Alt+A auto, Alt+D afficher/masquer
+  document.addEventListener('keydown', e => {
+    if (!frame || !e.altKey) return;
+    const k = e.key.toLowerCase();
+    if (k === 'd') frame.classList.toggle('ede-hidden');
+    else if (k === 'h' || k === 'a') send({ type: 'hotkey', mode: k === 'h' ? 'highlight' : 'auto' });
+    else return;
+    e.preventDefault();
+  }, true);
 })();
