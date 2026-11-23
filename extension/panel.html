@@ -1,36 +1,36 @@
 <!doctype html>
-<html lang="fr"><head><meta charset="utf-8"><link rel="stylesheet" href="panel.css"></head>
+<html lang="en"><head><meta charset="utf-8"><link rel="stylesheet" href="panel.css"></head>
 <body>
 <div class="card">
   <header id="drag">
     <img src="icons/128.png" alt="">
-    <div><h1>El Donut Engine</h1><p id="status">Chargement du moteur…</p></div>
-    <button id="min" title="Réduire">–</button>
+    <div><h1>El Donut Engine</h1><p id="status">Loading engine…</p></div>
+    <button id="min" title="Minimize">–</button>
   </header>
   <main>
     <div class="seg" id="mode">
       <button data-v="off">Off</button>
-      <button data-v="highlight">Surligner</button>
+      <button data-v="highlight">Highlight</button>
       <button data-v="auto">Auto</button>
     </div>
-    <label class="row"><span>Elo du moteur</span><b id="eloV"></b></label>
+    <label class="row"><span>Engine Elo</span><b id="eloV"></b></label>
     <input type="range" id="elo" min="1320" max="3190" step="10">
-    <label class="row"><span>Délai entre coups (auto)</span><b id="delayV"></b></label>
+    <label class="row"><span>Move delay (auto)</span><b id="delayV"></b></label>
     <input type="range" id="delay" min="0" max="10000" step="100">
-    <label class="row"><span>Profondeur</span><b id="depthV"></b></label>
+    <label class="row"><span>Depth</span><b id="depthV"></b></label>
     <input type="range" id="depth" min="4" max="22" step="1">
-    <label class="row"><span>Lignes analysées</span><b id="linesV"></b></label>
+    <label class="row"><span>Lines</span><b id="linesV"></b></label>
     <input type="range" id="linesR" min="1" max="3" step="1">
     <div class="checks">
-      <label class="toggle"><input type="checkbox" id="jitter"><i></i><span>Délai humain</span></label>
-      <label class="toggle"><input type="checkbox" id="arrows"><i></i><span>Flèches</span></label>
-      <label class="toggle"><input type="checkbox" id="evalbar"><i></i><span>Barre d'éval</span></label>
+      <label class="toggle"><input type="checkbox" id="jitter"><i></i><span>Human delay</span></label>
+      <label class="toggle"><input type="checkbox" id="arrows"><i></i><span>Arrows</span></label>
+      <label class="toggle"><input type="checkbox" id="evalbar"><i></i><span>Eval bar</span></label>
     </div>
-    <div class="out"><div><small>Meilleur coup</small><b id="best">—</b></div><div><small>Éval</small><b id="eval">—</b></div><div><small>Prof.</small><b id="dep">—</b></div></div>
+    <div class="out"><div><small>Best move</small><b id="best">—</b></div><div><small>Eval</small><b id="eval">—</b></div><div><small>Depth</small><b id="dep">—</b></div></div>
     <ol id="lines"></ol>
-    <p class="keys">Alt+H surligner · Alt+A auto · Alt+D menu</p>
+    <p class="keys">Alt+H highlight · Alt+A auto · Alt+D menu</p>
   </main>
-  <footer>Bots uniquement · Stockfish 17.1 · 🍩</footer>
+  <footer>Bots only · Stockfish 17.1 · 🍩</footer>
 </div>
 <script src="panel.js"></script>
 </body></html>

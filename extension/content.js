@@ -1,7 +1,7 @@
 // El Donut Engine — content script
-// Lit l'échiquier chess.com, envoie la position au moteur (iframe du menu),
-// surligne le meilleur coup ou le joue automatiquement.
-// Volontairement limité aux parties contre l'ordinateur (/play/computer).
+// Reads the chess.com board, sends the position to the engine (menu iframe),
+// highlights the best move or plays it automatically.
+// Deliberately limited to games vs the computer (/play/computer).
 (() => {
   'use strict';
   const EXT_ORIGIN = new URL(chrome.runtime.getURL('')).origin;
@@ -53,7 +53,7 @@
     if (m.type === 'ede:toggle' && frame) frame.classList.toggle('ede-hidden');
   });
 
-  // ---------- Lecture du plateau ----------
+  // ---------- Board reading ----------
   const board = () => document.querySelector('wc-chess-board, chess-board');
   const sqClass = el => (el.className.match(/square-(\d)(\d)/) || []).slice(1).map(Number);
 
@@ -67,20 +67,20 @@
       if (code && f && r) grid[r - 1][f - 1] = code;
     });
 
-    // Trait : la pièce posée sur une case "highlight" vient de jouer
+    // Side to move: the piece on a "highlight" square just moved
     let turn = 'w', ep = '-';
     const hls = [...b.querySelectorAll('.highlight')].map(sqClass).filter(a => a.length);
     for (const [f, r] of hls) {
       const pc = grid[r - 1][f - 1];
       if (!pc) continue;
       turn = pc[0] === 'w' ? 'b' : 'w';
-      // prise en passant possible après une avancée de 2 cases
+      // en passant possible after a 2-square pawn push
       const other = hls.find(([f2, r2]) => f2 === f && Math.abs(r2 - r) === 2);
       if (pc[1] === 'p' && other) ep = 'abcdefgh'[f - 1] + ((r + other[1]) / 2);
       break;
     }
 
-    // Roques : approximation par position du roi et des tours
+    // Castling: approximated from king/rook positions
     const at = (f, r) => grid[r - 1][f - 1];
     let c = '';
     if (at(5, 1) === 'wk') { if (at(8, 1) === 'wr') c += 'K'; if (at(1, 1) === 'wr') c += 'Q'; }
@@ -101,7 +101,7 @@
     return { fen: `${rows.join('/')} ${turn} ${c || '-'} ${ep} 0 1`, turn, me, b };
   }
 
-  // ---------- Coups ----------
+  // ---------- Moves ----------
   function sqRect(b, f, r) {
     const R = b.getBoundingClientRect(), s = R.width / 8;
     const flipped = b.classList.contains('flipped');
@@ -209,7 +209,7 @@
     }
   }
 
-  // ---------- Boucle ----------
+  // ---------- Loop ----------
   function tick() {
     if (!ALLOWED(location.pathname)) { if (frame) unmount(); return; }
     mount();
@@ -224,7 +224,7 @@
   }
   setInterval(tick, 250);
 
-  // Raccourcis : Alt+H surligner, Alt+A auto, Alt+D afficher/masquer
+  // Hotkeys: Alt+H highlight, Alt+A auto, Alt+D show/hide
   document.addEventListener('keydown', e => {
     if (!frame || !e.altKey) return;
     const k = e.key.toLowerCase();

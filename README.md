@@ -1,63 +1,84 @@
 <p align="center"><img src="extension/icons/512.png" width="140"></p>
 <h1 align="center">El Donut Engine 🍩</h1>
-<p align="center">Mod menu rose pastel pour les parties <b>contre les bots</b> de chess.com, propulsé par Stockfish 17.1 (100 % local).</p>
+<p align="center">A pink pastel mod menu for <b>games against chess.com bots</b>, powered by Stockfish 17.1 and running 100% locally.</p>
 
-> ⚠️ **Bots uniquement.** L'extension ne s'active que sur `chess.com/play/computer`. Elle ne fonctionne pas, et ne fonctionnera pas, en partie live contre des humains. L'automatisation peut tout de même enfreindre les CGU de chess.com : utilise-la à tes risques (de préférence sur un compte secondaire).
+> ⚠️ **Bots only.** The extension only turns on at `chess.com/play/computer`. It does not work in live games against humans, and it never will. Automation may still go against chess.com's Terms of Service, so use it at your own risk (ideally on a secondary account).
 
-## ✨ Fonctionnalités
+---
+
+## 📥 Installation tutorial (2 minutes, no coding)
+
+**Step 1: Download**
+- Click the green **`<> Code`** button at the top of this page, then **Download ZIP**.
+- Unzip the file somewhere you'll keep it, like `Documents/el-donut-engine`. Don't delete this folder afterwards, because Chrome loads the extension from it.
+
+**Step 2: Open the extensions page**
+- In Chrome, type `chrome://extensions` in the address bar and press Enter.
+
+**Step 3: Turn on Developer mode**
+- Click the **Developer mode** switch in the top-right corner.
+
+**Step 4: Load the extension**
+- Click **Load unpacked** (top-left).
+- Select the **`extension`** folder inside the unzipped folder. This is the folder that contains `manifest.json`.
+
+**Step 5: Pin it**
+- Click the puzzle icon 🧩 in the toolbar, then the pin next to **El Donut Engine**.
+
+**Step 6: Play**
+- Go to <https://www.chess.com/play/computer> and start a game. The menu shows up in the top-right corner.
+
+✅ This also works in **Edge** (`edge://extensions`), **Brave** (`brave://extensions`), **Opera** and **Arc**, using the same steps.
+
+**Updating:** download the new ZIP, replace the folder, then click ↻ on the extension card in `chrome://extensions`.
+
+---
+
+## ✨ Features
 | | |
 |---|---|
-| **Surligner** | Le meilleur coup s'affiche sur l'échiquier (case de départ + case d'arrivée 🍩) quand c'est ton tour. |
-| **Auto** | Le moteur joue le coup tout seul après le délai choisi. Gère la promotion (dame). |
-| **Délai** | 0 à 10 s entre chaque coup en mode auto. |
-| **Elo du moteur** | 1320 → 3190 (Max = pleine puissance), via `UCI_LimitStrength` de Stockfish. |
-| **Profondeur** | 4 à 22 demi-coups. Plus c'est haut, plus c'est fort et plus c'est lent. |
-| **Multi-lignes** | Jusqu'à 3 meilleurs coups affichés en même temps, chacun avec son évaluation. |
-| **Flèches** | Flèches roses dégradées sur l'échiquier (la plus foncée = le meilleur coup). |
-| **Barre d'éval** | Barre d'évaluation à côté du plateau, orientée selon ta couleur, mats inclus. |
-| **Délai humain** | Fait varier le délai de ±30 % pour un rythme moins mécanique. |
-| **Raccourcis** | `Alt+H` surligner · `Alt+A` auto · `Alt+D` afficher/masquer le menu. |
-| **Menu** | Déplaçable (glisse l'en-tête), réductible, réglages sauvegardés. Clic sur l'icône 🍩 = afficher/masquer. |
+| **Highlight** | Shows the best move on the board (the from-square plus a 🍩 on the target square) on your turn. |
+| **Auto** | Plays the move for you after your chosen delay. Promotes to a queen automatically. |
+| **Move delay** | 0 to 10 seconds between moves in Auto mode. |
+| **Human delay** | Varies the delay by ±30% for a less mechanical rhythm. |
+| **Engine Elo** | 1320 to 3190 (Max means full strength), using Stockfish's `UCI_LimitStrength`. |
+| **Depth** | 4 to 22 plies. Higher is stronger but slower. |
+| **Multi-line** | Up to 3 best moves at once, each with its own evaluation. |
+| **Arrows** | Pink gradient arrows on the board. The darkest one is the best move. |
+| **Eval bar** | An evaluation bar next to the board, oriented to your color, including mate scores. |
+| **Hotkeys** | `Alt+H` highlight · `Alt+A` auto · `Alt+D` show/hide the menu. |
+| **Menu** | Draggable, can be minimized, and remembers your settings. Clicking the 🍩 icon shows or hides it. |
 
-## 📦 Installation (2 minutes, aucun code requis)
-1. Télécharge **`el-donut-engine.zip`** depuis la page [Releases](../../releases) (ou *Code → Download ZIP*) et **dézippe-le**.
-2. Ouvre Chrome et va sur `chrome://extensions`.
-3. Active le **Mode développeur** (interrupteur en haut à droite).
-4. Clique sur **Charger l'extension non empaquetée** et sélectionne le dossier **`extension`**.
-5. Épingle l'icône 🍩 dans la barre d'outils (icône puzzle → épingle).
-6. Va sur <https://www.chess.com/play/computer>, lance une partie : le menu apparaît en haut à droite.
-
-Marche aussi sur Edge, Brave, Opera et Arc (même procédure via leur page d'extensions).
-
-## 🎮 Utilisation
-1. Choisis un bot et lance la partie.
-2. Dans le menu, choisis **Surligner** ou **Auto**.
-3. Règle l'Elo, la profondeur et le délai. Les changements s'appliquent dès le coup suivant.
-4. **Off** met tout en pause sans fermer le menu.
+## 🎮 Usage
+1. Pick a bot and start the game.
+2. In the menu, choose **Highlight** or **Auto**.
+3. Set the Elo, depth, delay and number of lines. Changes apply from the next move.
+4. **Off** pauses everything without closing the menu.
 
 ## 🛠️ Architecture
 ```
 extension/
-├── manifest.json     # Manifest V3, s'injecte uniquement sur chess.com
-├── background.js     # clic sur l'icône → afficher/masquer le menu
-├── content.js        # lit le plateau (DOM), construit la FEN, surligne / joue
-├── content.css       # style des surlignages + du cadre du menu
-├── panel.html/css/js # menu (iframe isolée) + Worker Stockfish
+├── manifest.json     # Manifest V3, injected on chess.com only
+├── background.js     # toolbar icon → show/hide the menu
+├── content.js        # reads the board (DOM), builds the FEN, draws highlights/arrows/eval bar, plays moves
+├── content.css       # overlay styles
+├── panel.html/css/js # menu (isolated iframe) + Stockfish Web Worker
 ├── engine/           # Stockfish 17.1 lite single-thread (WASM, GPL-3)
-└── icons/            # donut 🍩
+└── icons/            # 🍩
 ```
-- **Lecture du plateau** : les pièces sont des `.piece.wp.square-52` (colonne 5, rangée 2) dans `wc-chess-board`. Le trait est déduit des cases `.highlight` du dernier coup ; le côté joueur est déduit de la classe `flipped`.
-- **Moteur** : il tourne dans un Web Worker à l'intérieur de l'iframe du menu (origine de l'extension), ce qui contourne les restrictions CSP de la page. Aucune requête réseau.
-- **Coups auto** : on simule des événements pointeur sur la case de départ puis sur la case d'arrivée.
-- **Garde-fou** : `content.js` démonte tout dès que l'URL quitte `/play/computer`.
+- **Board reading:** pieces are `.piece.wp.square-52` elements (file 5, rank 2) inside `wc-chess-board`. The side to move comes from the last-move `.highlight` squares, and your color from the `flipped` class.
+- **Engine:** runs in a Web Worker inside the menu iframe (extension origin), which avoids the page's CSP. It makes no network requests.
+- **Auto moves:** simulated pointer events on the from-square, then on the to-square.
+- **Safeguard:** `content.js` tears everything down as soon as the URL leaves `/play/computer`.
 
-## ❓ Dépannage
-| Problème | Solution |
+## ❓ Troubleshooting
+| Problem | Fix |
 |---|---|
-| Le menu n'apparaît pas | Vérifie que l'URL est bien `/play/computer` et recharge la page. |
-| « Chargement du moteur… » reste affiché | Recharge l'extension dans `chrome://extensions`. |
-| Le mode auto ne joue pas | chess.com a peut-être changé son DOM : ouvre une *issue*. Le mode Surligner reste utilisable. |
-| Mauvais coups au début | Les droits de roque et la prise en passant sont estimés depuis le plateau ; c'est rare mais possible. |
+| The menu doesn't appear | Make sure the URL is `/play/computer`, then reload the page. |
+| It stays on "Loading engine…" | Reload the extension in `chrome://extensions`. |
+| "Manifest file is missing" | You selected the wrong folder. Pick the one that contains `manifest.json`. |
+| Auto mode doesn't move | chess.com may have changed its page layout. Open an issue; Highlight mode still works. |
+| A wrong move early in the game | Castling rights and en passant are estimated from the board. It's rare, but it can happen. |
 
-## 📜 Licence
-GPL-3.0 (Stockfish est GPL-3). Projet non affilié à chess.com.
+## 📜 License
+GPL-3.0 (Stockfish is GPL-3). Not affiliated with chess.com.

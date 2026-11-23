@@ -1,4 +1,4 @@
-// El Donut Engine — menu + moteur Stockfish (tourne dans l'iframe de l'extension)
+// El Donut Engine — menu + Stockfish engine (runs inside the extension iframe)
 const PARENT = 'https://www.chess.com';
 const $ = id => document.getElementById(id);
 const DEF = { mode: 'off', delay: 1500, jitter: true, elo: 2000, depth: 14, lines: 1, arrows: true, evalbar: true };
@@ -31,7 +31,7 @@ engine.onmessage = ({ data: l }) => {
 function fmtEval(e, fen) {
   if (!e) return '—';
   if (e[0] === 'M') return e;
-  const v = parseFloat(e) * (fen.split(' ')[1] === 'b' ? -1 : 1); // point de vue des blancs
+  const v = parseFloat(e) * (fen.split(' ')[1] === 'b' ? -1 : 1); // from White's point of view
   return (v > 0 ? '+' : '') + v.toFixed(2);
 }
 function applyEngine() {
@@ -52,8 +52,8 @@ window.addEventListener('message', e => {
 
 // ---------- UI ----------
 const status = () => $('status').textContent = engineOk
-  ? ({ off: 'En pause', highlight: 'Surlignage actif', auto: 'Jeu automatique' })[S.mode]
-  : 'Chargement du moteur…';
+  ? ({ off: 'Paused', highlight: 'Highlighting', auto: 'Auto-play' })[S.mode]
+  : 'Loading engine…';
 function render() {
   document.querySelectorAll('#mode button').forEach(b => b.classList.toggle('on', b.dataset.v === S.mode));
   for (const k of ['elo', 'delay', 'depth', 'linesR']) {
