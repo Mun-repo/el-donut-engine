@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><link rel="stylesheet" href="panel.css"></head>
+<body>
+<div class="card">
+  <header id="drag">
+    <img src="icons/128.png" alt="">
+    <div><h1>El Donut Engine</h1><p id="status">Chargement du moteur…</p></div>
+    <button id="min" title="Réduire">–</button>
+  </header>
+  <main>
+    <div class="seg" id="mode">
+      <button data-v="off">Off</button>
+      <button data-v="highlight">Surligner</button>
+      <button data-v="auto">Auto</button>
+    </div>
+    <label class="row"><span>Elo du moteur</span><b id="eloV"></b></label>
+    <input type="range" id="elo" min="1320" max="3190" step="10">
+    <label class="row"><span>Délai entre coups (auto)</span><b id="delayV"></b></label>
+    <input type="range" id="delay" min="0" max="10000" step="100">
+    <label class="row"><span>Profondeur</span><b id="depthV"></b></label>
+    <input type="range" id="depth" min="4" max="22" step="1">
+    <label class="toggle"><input type="checkbox" id="jitter"><i></i><span>Délai aléatoire ±30 %</span></label>
+    <div class="out"><div><small>Meilleur coup</small><b id="best">—</b></div><div><small>Éval</small><b id="eval">—</b></div></div>
+  </main>
+  <footer>Bots uniquement · Stockfish 17.1 · 🍩</footer>
+</div>
+<script src="panel.js"></script>
+</body></html>
