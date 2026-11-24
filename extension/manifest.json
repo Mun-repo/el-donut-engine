@@ -3,6 +3,12 @@
   "name": "El Donut Engine",
   "version": "2.1.0",
   "description": "Pink pastel Stockfish assistant for games against chess.com bots. Runs 100% locally.",
+  "permissions": [
+    "storage"
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  },
   "icons": {
     "16": "icons/16.png",
     "48": "icons/48.png",
