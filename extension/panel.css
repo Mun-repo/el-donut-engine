@@ -16,6 +16,8 @@ body[data-theme=light]{
   --accent:#d9668f;--accent-wash:rgba(217,102,143,.09);
   --cream:#6b5a45;--good:#2f9563;--warn:#c27a2c;--bad:#cf4b4b;--meh:#a8860f
 }
+@font-face{font-family:Fraunces;src:url(fonts/fraunces.woff2) format("woff2");font-weight:100 900;font-display:block}
+:root{--serif:Fraunces,"Iowan Old Style",Georgia,serif}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{background:transparent;overflow:hidden;color:var(--text);font:13.5px/1.4 var(--font);-webkit-font-smoothing:antialiased}
 svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
@@ -204,3 +206,13 @@ kbd{font:600 11px var(--font);min-width:24px;text-align:center;padding:3px 6px;b
 body[data-lines="1"] .lines-block{display:none}
 body:not([data-mode=auto]) .delay-card{display:none}
 body[data-mode=off] .hero{opacity:.5;filter:saturate(.4)}
+
+/* ---------- display serif for the moments that matter ---------- */
+h1{font:600 17px/1.1 var(--serif);letter-spacing:-.01em;font-variation-settings:"opsz" 24}
+.hero-main b{font-size:36px;font-weight:250;letter-spacing:-.02em}
+.hero-main b.wait{font-family:var(--serif);font-weight:300;font-size:20px}
+.lbl b{font-family:var(--serif);font-weight:300;font-size:28px;font-variation-settings:"opsz" 48}
+.ring b{font-family:var(--serif);font-weight:300;font-size:60px;letter-spacing:-.03em;font-variation-settings:"opsz" 144}
+.ring b::after{font-family:var(--serif);font-weight:300;font-size:26px}
+.stat b,.cnt b{font-family:var(--serif);font-weight:400;font-size:22px;font-variation-settings:"opsz" 36}
+.mode-desc{font-family:var(--serif);font-size:13px;font-variation-settings:"opsz" 14}
