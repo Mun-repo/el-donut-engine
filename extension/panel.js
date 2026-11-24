@@ -78,9 +78,20 @@ function meter(e) {
   const v = num(e); const p = v == null ? 50 : 50 + 50 * Math.tanh(v / 4);
   $('meter').style.width = p + '%';
 }
+// Mini board: shows the move's squares, oriented for the side to move
+const boardEl = $('board');
+for (let i = 0; i < 64; i++) { const c = document.createElement('i'); if (((i >> 3) + i) % 2) c.className = 'dk'; boardEl.appendChild(c); }
+function drawBoard(best, fen) {
+  const cells = boardEl.children, flip = fen && fen.split(' ')[1] === 'b';
+  for (const c of cells) c.classList.remove('fr', 'to');
+  if (!best || best.length < 4 || S.mode === 'check') return;
+  const idx = sq => { const f = sq.charCodeAt(0) - 97, r = +sq[1] - 1; return flip ? r * 8 + (7 - f) : (7 - r) * 8 + f; };
+  cells[idx(best.slice(0, 2))].classList.add('fr');
+  if (S.mode !== 'coach') cells[idx(best.slice(2, 4))].classList.add('to');
+}
 let last = null;
 function showResult(best, ev, pvs) {
-  last = { best, ev, pvs };
+  last = { best, ev, pvs }; drawBoard(best, current);
   $('heroLbl').textContent = t(S.mode === 'coach' ? 'pieceToMove' : 'bestMove');
   const b = $('best'); b.classList.remove('wait');
   // Check mode hides the answer (you play alone); Coach shows only the piece's square

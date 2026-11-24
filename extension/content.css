@@ -19,15 +19,14 @@
 /* mini-bar — sits in chess.com's sidebar, liquid glass */
 #ede-mini{display:flex;align-items:center;gap:10px;margin:0 0 8px;padding:8px 8px 8px 12px;border-radius:14px;
   font:600 14px/1 -apple-system,BlinkMacSystemFont,"Segoe UI Variable Text","Segoe UI",system-ui,sans-serif;color:#fff;
-  background:linear-gradient(160deg,rgba(60,40,66,.85),rgba(28,22,34,.88));backdrop-filter:blur(18px) saturate(160%);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.18),inset 0 0 0 1px rgba(255,255,255,.12),0 6px 18px rgba(0,0,0,.3);font-variant-numeric:tabular-nums}
+  background:#121013;box-shadow:inset 0 0 0 1px rgba(255,240,245,.13),0 6px 18px rgba(0,0,0,.3);font-variant-numeric:tabular-nums}
 #ede-mini.ede-float{position:fixed;right:24px;bottom:24px;z-index:2147483646;margin:0;min-width:240px}
 #ede-mini .ede-m-logo{font-size:18px}
 #ede-mini .ede-m-mode{font-size:12px;padding:4px 9px;border-radius:20px;background:rgba(255,255,255,.12);color:rgba(255,255,255,.8)}
 #ede-mini[data-mode=highlight] .ede-m-mode,#ede-mini[data-mode=auto] .ede-m-mode{background:rgba(255,156,192,.22);color:#ffb3cf}
 #ede-mini[data-mode=coach] .ede-m-mode{background:rgba(185,160,255,.22);color:#cdbcff}
 #ede-mini[data-mode=check] .ede-m-mode{background:rgba(127,224,176,.2);color:#9be9c2}
-#ede-mini .ede-m-best{flex:1;font-size:16px;font-weight:700;color:#ff9cc0}
+#ede-mini .ede-m-best{flex:1;font-size:17px;font-weight:300;letter-spacing:-.01em;color:#f4eef0}
 #ede-mini .ede-m-eval{font-size:13px;color:rgba(255,255,255,.75)}
 #ede-mini .ede-m-open{width:32px;height:32px;border:0;border-radius:50%;cursor:pointer;color:#fff;font-size:15px;background:rgba(255,255,255,.12);box-shadow:inset 0 1px 0 rgba(255,255,255,.2)}
 #ede-mini .ede-m-open:hover{background:rgba(255,255,255,.2)}
@@ -35,7 +34,7 @@
 /* blunder-check toast */
 .ede-toast{position:absolute;z-index:60;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 16px;border-radius:16px;
   font:600 14px/1.2 -apple-system,BlinkMacSystemFont,"Segoe UI Variable Text","Segoe UI",system-ui,sans-serif;color:#fff;white-space:nowrap;pointer-events:none;
-  background:rgba(30,22,34,.82);backdrop-filter:blur(16px);box-shadow:inset 0 1px 0 rgba(255,255,255,.2),inset 0 0 0 1px rgba(255,255,255,.12),0 10px 30px rgba(0,0,0,.4);
+  background:#121013;box-shadow:inset 0 0 0 1px rgba(255,240,245,.13),0 10px 30px rgba(0,0,0,.45);
   animation:ede-in .3s cubic-bezier(.22,1,.36,1);transition:opacity .4s,transform .4s}
 .ede-toast span{font-size:12.5px;font-weight:500;color:rgba(255,255,255,.75)}
 .ede-toast.ede-bad b{color:#ff9a9a}.ede-toast.ede-warn b{color:#ffc58f}
