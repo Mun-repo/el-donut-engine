@@ -1,4 +1,4 @@
-#ede-frame{position:fixed;top:90px;right:24px;width:320px;height:560px;border:0;z-index:2147483646;border-radius:20px;box-shadow:0 24px 60px rgba(80,30,50,.22),0 4px 14px rgba(80,30,50,.1);background:transparent;transition:opacity .2s,transform .2s}
+#ede-frame{position:fixed;top:90px;right:24px;width:320px;height:560px;border:0;z-index:2147483646;border-radius:26px;box-shadow:0 30px 70px rgba(0,0,0,.55),0 6px 18px rgba(0,0,0,.3);background:transparent;transition:opacity .2s,transform .2s}
 #ede-frame.ede-hidden{opacity:0;transform:translateY(-8px) scale(.97);pointer-events:none}
 .ede-hl{position:absolute;pointer-events:none;z-index:50;border-radius:6px;box-sizing:border-box}
 .ede-from{background:rgba(242,167,192,.30);box-shadow:inset 0 0 0 2px rgba(255,255,255,.75)}
