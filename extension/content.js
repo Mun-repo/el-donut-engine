@@ -5,7 +5,8 @@
 (() => {
   'use strict';
   const EXT_ORIGIN = new URL(chrome.runtime.getURL('')).origin;
-  const ALLOWED = p => p.startsWith('/play/computer');
+  // Page guard lives in guard.js (loaded first). Fails closed if missing.
+  const ALLOWED = typeof self.EDE_ALLOWED === 'function' ? self.EDE_ALLOWED : () => false;
 
   let frame = null;
   let ready = false;
@@ -15,6 +16,12 @@
   let pending = null;   // { fen, best }
   let playTimer = null;
   let hl = [];
+  // UI state (mini-bar, review, toasts)
+  let mini = null, toastEl = null, lastBest = '', lastEv = '';
+  let mineInfo = null;   // { fen, ev, best, me } — last analysed position where it was my turn
+  let oppFen = '';       // position right after my move, awaiting evaluation
+  let playedMove = '';
+  let review = [], pieceCount = 0, posTimer = null;
 
   // ---------- UI ----------
   function mount() {
@@ -24,10 +31,17 @@
     frame.src = chrome.runtime.getURL('panel.html');
     frame.allow = '';
     document.documentElement.appendChild(frame);
+    chrome.storage.local.get('edePos', r => {
+      const p = r.edePos; if (!p || !frame) return;
+      frame.style.left = Math.max(0, Math.min(innerWidth - 360, p.left)) + 'px';
+      frame.style.top = Math.max(0, Math.min(innerHeight - 60, p.top)) + 'px';
+      frame.style.right = 'auto';
+    });
   }
   function unmount() {
     clearHL(); clearTimeout(playTimer); bar?.remove(); bar = null;
     frame?.remove(); frame = null; ready = false; lastFen = '';
+    mini?.remove(); mini = null; toastEl?.remove(); toastEl = null; mineInfo = null; oppFen = ''; review = [];
   }
   const send = msg => frame?.contentWindow?.postMessage(msg, EXT_ORIGIN);
 
@@ -37,7 +51,8 @@
     if (m.type === 'ready') { ready = true; lastFen = ''; }
     else if (m.type === 'settings') {
       settings = { ...settings, ...m.settings };
-      lastFen = ''; clearHL(); clearTimeout(playTimer);
+      lastFen = ''; clearHL(); clearTimeout(playTimer); updMini();
+      if (settings.mode === 'check' || settings.mode === 'off') { bar?.remove(); bar = null; }
     }
     else if (m.type === 'best') onBest(m);
     else if (m.type === 'drag') {
@@ -45,8 +60,10 @@
       frame.style.left = Math.max(0, Math.min(innerWidth - r.width, r.left + m.dx)) + 'px';
       frame.style.top = Math.max(0, Math.min(innerHeight - 40, r.top + m.dy)) + 'px';
       frame.style.right = 'auto';
+      clearTimeout(posTimer);
+      posTimer = setTimeout(() => chrome.storage.local.set({ edePos: { left: parseFloat(frame.style.left), top: parseFloat(frame.style.top) } }), 300);
     }
-    else if (m.type === 'minimize') frame.style.height = m.min ? '64px' : '560px';
+    else if (m.type === 'minimize') setMin(m.min);
   });
 
   chrome.runtime.onMessage.addListener(m => {
@@ -189,15 +206,97 @@
     }, 60);
   }
 
+  function coach(b, uci) {
+    clearHL();
+    const { from: [f, r] } = parseUci(uci), { x, y, s } = sqRect(b, f, r);
+    const d = document.createElement('div');
+    d.className = 'ede-hl ede-coach';
+    Object.assign(d.style, { left: x + 'px', top: y + 'px', width: s + 'px', height: s + 'px' });
+    b.appendChild(d); hl.push(d);
+  }
+
+  // ---------- Mini-bar (shown in chess.com's sidebar when the menu is minimised) ----------
+  const T = {
+    en: { off: 'Off', highlight: 'Hint', coach: 'Coach', check: 'Check', auto: 'Auto', open: 'Open menu', blunder: 'Blunder', mistake: 'Mistake', better: 'better was' },
+    fr: { off: 'Off', highlight: 'Indice', coach: 'Coach', check: 'Vérif', auto: 'Auto', open: 'Ouvrir le menu', blunder: 'Gaffe', mistake: 'Erreur', better: 'mieux :' }
+  };
+  const t = k => (T[settings.lang] || T.en)[k] || k;
+  const pretty = u => u && u.length >= 4 ? u.slice(0, 2) + ' → ' + u.slice(2, 4) : '—';
+  function setMin(on) {
+    if (!frame) return;
+    frame.classList.toggle('ede-min', on);
+    if (on) mountMini(); else { mini?.remove(); mini = null; }
+  }
+  function mountMini() {
+    if (mini?.isConnected) return updMini();
+    mini = document.createElement('div'); mini.id = 'ede-mini';
+    for (const c of ['ede-m-logo', 'ede-m-mode', 'ede-m-best', 'ede-m-eval']) {
+      const e = document.createElement('span'); e.className = c; mini.appendChild(e);
+    }
+    mini.firstChild.textContent = '🍩';
+    const btn = document.createElement('button'); btn.className = 'ede-m-open'; btn.textContent = '⤢';
+    btn.onclick = () => { setMin(false); send({ type: 'restored' }); };
+    mini.appendChild(btn);
+    const host = document.querySelector('#board-layout-sidebar, .board-layout-sidebar');
+    if (host) host.prepend(mini); else { mini.classList.add('ede-float'); document.body.appendChild(mini); }
+    updMini();
+  }
+  function updMini() {
+    if (!mini) return;
+    mini.dataset.mode = settings.mode;
+    mini.querySelector('.ede-m-mode').textContent = t(settings.mode);
+    const hide = settings.mode === 'off' || settings.mode === 'check';
+    mini.querySelector('.ede-m-best').textContent = hide ? '' : (settings.mode === 'coach' ? (lastBest ? lastBest.slice(0, 2) : '—') : pretty(lastBest));
+    mini.querySelector('.ede-m-eval').textContent = hide ? '' : (lastEv || '');
+    mini.querySelector('.ede-m-open').title = t('open');
+  }
+
+  // ---------- Review / blunder check ----------
+  const num = e => !e || e === '—' ? null : e[0] === 'M' ? (e.includes('-') ? -20 : 20) : parseFloat(e);
+  const wp = x => 50 + 50 * (2 / (1 + Math.exp(-0.368 * x)) - 1);
+  function toast(b, title, sub, kind) {
+    toastEl?.remove();
+    toastEl = document.createElement('div'); toastEl.className = 'ede-toast ede-' + kind;
+    const h = document.createElement('b'); h.textContent = title;
+    const p = document.createElement('span'); p.textContent = sub;
+    toastEl.append(h, p);
+    const R = b.getBoundingClientRect(), P = b.parentElement.getBoundingClientRect();
+    Object.assign(toastEl.style, { left: (R.left - P.left + R.width / 2) + 'px', top: (R.top - P.top + 14) + 'px' });
+    b.parentElement.appendChild(toastEl);
+    const el = toastEl;
+    setTimeout(() => el.classList.add('ede-out'), 3800);
+    setTimeout(() => el.remove(), 4300);
+  }
+  function onReply({ fen, eval: ev }) {
+    if (fen !== oppFen || !mineInfo) return;
+    const before = num(mineInfo.ev), after = num(ev);
+    if (before == null || after == null) return;
+    const sign = mineInfo.me === 'w' ? 1 : -1;
+    const drop = Math.max(0, wp(before * sign) - wp(after * sign));
+    review.push({ move: playedMove, best: mineInfo.best, before: mineInfo.ev, after: ev, drop: +drop.toFixed(1) });
+    send({ type: 'review', entries: review });
+    if (settings.mode === 'check' && drop >= 10) {
+      const b = board();
+      if (b) toast(b, (drop >= 20 ? t('blunder') : t('mistake')) + '  ' + ev, t('better') + ' ' + pretty(mineInfo.best), drop >= 20 ? 'bad' : 'warn');
+    }
+    mineInfo = null;
+  }
+
   function show(b, best, pvs) {
     highlight(b, best);
     if (settings.arrows && pvs?.length) arrows(b, pvs);
   }
-  function onBest({ fen, best, pvs, eval: ev }) {
+  function onBest(m) {
+    if (m.mine === false) return onReply(m);
+    const { fen, best, pvs, eval: ev } = m;
     if (fen !== lastFen || !best || best === '(none)') return;
     const b = board(); if (!b) return;
-    evalBar(b, ev);
+    const me = b.classList.contains('flipped') ? 'b' : 'w';
+    mineInfo = { fen, ev, best, me };
+    lastBest = best; lastEv = ev; updMini();
+    if (settings.mode !== 'check') evalBar(b, ev);
     if (settings.mode === 'highlight') show(b, best, pvs);
+    else if (settings.mode === 'coach') coach(b, best);
     else if (settings.mode === 'auto') {
       show(b, best, pvs);
       const jitter = settings.jitter ? (Math.random() * 0.6 - 0.3) * settings.delay : 0;
@@ -209,6 +308,8 @@
     }
   }
 
+  const readPiece = (b, f, r) => b.querySelector(`.piece.square-${f}${r}`);
+
   // ---------- Loop ----------
   function tick() {
     if (!ALLOWED(location.pathname)) { if (frame) unmount(); return; }
@@ -216,11 +317,27 @@
     if (!ready || settings.mode === 'off') { clearHL(); return; }
     const pos = readPosition();
     if (!pos) return;
-    if (pos.turn !== pos.me) { if (pos.fen !== lastFen) { clearHL(); clearTimeout(playTimer); lastFen = pos.fen; } return; }
+    const count = (pos.fen.split(' ')[0].match(/[a-z]/gi) || []).length;
+    if (count > pieceCount) { review = []; mineInfo = null; send({ type: 'review', entries: review }); }  // new game
+    pieceCount = count;
+    if (pos.turn !== pos.me) {
+      if (pos.fen !== lastFen) {
+        clearHL(); clearTimeout(playTimer); lastFen = pos.fen;
+        // Evaluate the position after my move (for review / blunder check)
+        if (mineInfo && settings.mode !== 'auto') {
+          const sq = [...pos.b.querySelectorAll('.highlight')].map(sqClass).filter(a => a.length);
+          const to = sq.find(([f, r]) => pos.fen && readPiece(pos.b, f, r)), from = sq.find(x => x !== to);
+          playedMove = from && to ? 'abcdefgh'[from[0] - 1] + from[1] + 'abcdefgh'[to[0] - 1] + to[1] : '';
+          oppFen = pos.fen;
+          send({ type: 'analyse', fen: pos.fen, mine: false });
+        }
+      }
+      return;
+    }
     if (pos.fen === lastFen) return;
     lastFen = pos.fen;
     clearHL(); clearTimeout(playTimer);
-    send({ type: 'analyse', fen: pos.fen });
+    send({ type: 'analyse', fen: pos.fen, mine: true });
   }
   setInterval(tick, 250);
 
@@ -229,7 +346,7 @@
     if (!frame || !e.altKey) return;
     const k = e.key.toLowerCase();
     if (k === 'd') frame.classList.toggle('ede-hidden');
-    else if (k === 'h' || k === 'a') send({ type: 'hotkey', mode: k === 'h' ? 'highlight' : 'auto' });
+    else if (k === 'h' || k === 'a' || k === 'c' || k === 'v') send({ type: 'hotkey', mode: { h: 'highlight', a: 'auto', c: 'coach', v: 'check' }[k] });
     else return;
     e.preventDefault();
   }, true);

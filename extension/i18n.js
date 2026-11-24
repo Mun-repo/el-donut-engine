@@ -1,0 +1,45 @@
+// El Donut Engine — UI strings (EN / FR)
+const I18N = {
+  en: {
+    off: 'Off', highlight: 'Hint', coach: 'Coach', check: 'Check', auto: 'Auto',
+    dOff: 'Paused. The engine is idle.', dHighlight: 'Shows the best move on the board.',
+    dCoach: 'Highlights only the piece to move — you find the square.', dCheck: 'You play alone. Warns you after a mistake or blunder.',
+    dAuto: 'Plays the best move for you.',
+    sLoading: 'Loading engine…', sOff: 'Ready · paused', sHighlight: 'Showing hints', sCoach: 'Coaching', sCheck: 'Watching for blunders', sAuto: 'Auto-playing',
+    bestMove: 'Best move', depth: 'Depth', topLines: 'Top lines', waiting: 'Waiting for your turn…', thinking: 'thinking…', noMoves: 'No legal moves',
+    hidden: 'Hidden', pieceToMove: 'Piece to move',
+    delay: 'Move delay', delayHint: 'Wait time before each auto move.',
+    eval: 'Eval', equal: 'Equal', wBetter: 'White better', bBetter: 'Black better', wWin: 'White winning', bWin: 'Black winning', mate: 'Forced mate',
+    accuracy: 'Accuracy', blunders: 'Blunders', mistakes: 'Mistakes', inaccuracies: 'Inaccuracies', bestMoves: 'Best moves',
+    yourMoves: 'Your moves', noReview: 'Play in Hint, Coach or Check mode: each of your moves is graded here.', insteadOf: 'best',
+    gBest: 'Best', gGood: 'Good', gInacc: 'Inaccuracy', gMistake: 'Mistake', gBlunder: 'Blunder',
+    strength: 'Strength', casual: 'Casual', club: 'Club', master: 'Master', searchDepth: 'Search depth', depthHint: 'Deeper = stronger, but slower to answer.',
+    linesAnalysed: 'Lines analysed', engineSub: 'WASM · single-thread · 100% offline',
+    arrows: 'Arrows', arrowsSub: 'Draw the best moves on the board', evalbar: 'Evaluation bar', evalbarSub: 'Shown beside the board',
+    jitter: 'Human timing', jitterSub: 'Randomise the auto delay by ±30%', theme: 'Theme', dark: 'Dark', light: 'Light', language: 'Language',
+    shortcuts: 'Shortcuts', kHint: 'Toggle hints', kCoach: 'Toggle coach', kCheck: 'Toggle blunder check', kAuto: 'Toggle auto-play', kMenu: 'Show / hide menu', kModes: 'Modes (in menu)',
+    reset: 'Reset settings', version: 'Version', botsOnly: 'Works against chess.com bots only.',
+    tPlay: 'Play', tReview: 'Review', tEngine: 'Engine', tDisplay: 'Display', tAbout: 'About', minimize: 'Minimise to the sidebar'
+  },
+  fr: {
+    off: 'Off', highlight: 'Indice', coach: 'Coach', check: 'Vérif', auto: 'Auto',
+    dOff: 'En pause. Le moteur est inactif.', dHighlight: 'Affiche le meilleur coup sur l’échiquier.',
+    dCoach: 'Montre seulement la pièce à jouer, à toi de trouver la case.', dCheck: 'Tu joues seul. Alerte après une erreur ou une gaffe.',
+    dAuto: 'Joue le meilleur coup à ta place.',
+    sLoading: 'Chargement du moteur…', sOff: 'Prêt · en pause', sHighlight: 'Indices affichés', sCoach: 'Mode coach', sCheck: 'Surveille les gaffes', sAuto: 'Joue en auto',
+    bestMove: 'Meilleur coup', depth: 'Profondeur', topLines: 'Meilleures lignes', waiting: 'En attente de ton tour…', thinking: 'réflexion…', noMoves: 'Aucun coup légal',
+    hidden: 'Masqué', pieceToMove: 'Pièce à jouer',
+    delay: 'Délai du coup', delayHint: 'Temps d’attente avant chaque coup auto.',
+    eval: 'Éval', equal: 'Égalité', wBetter: 'Blancs mieux', bBetter: 'Noirs mieux', wWin: 'Blancs gagnent', bWin: 'Noirs gagnent', mate: 'Mat forcé',
+    accuracy: 'Précision', blunders: 'Gaffes', mistakes: 'Erreurs', inaccuracies: 'Imprécisions', bestMoves: 'Meilleurs coups',
+    yourMoves: 'Tes coups', noReview: 'Joue en mode Indice, Coach ou Vérif : chacun de tes coups est noté ici.', insteadOf: 'mieux',
+    gBest: 'Meilleur', gGood: 'Bon', gInacc: 'Imprécision', gMistake: 'Erreur', gBlunder: 'Gaffe',
+    strength: 'Force', casual: 'Détente', club: 'Club', master: 'Maître', searchDepth: 'Profondeur de calcul', depthHint: 'Plus profond = plus fort, mais plus lent.',
+    linesAnalysed: 'Lignes analysées', engineSub: 'WASM · mono-thread · 100 % hors ligne',
+    arrows: 'Flèches', arrowsSub: 'Dessine les meilleurs coups sur l’échiquier', evalbar: 'Barre d’éval', evalbarSub: 'Affichée à côté de l’échiquier',
+    jitter: 'Rythme humain', jitterSub: 'Varie le délai auto de ±30 %', theme: 'Thème', dark: 'Sombre', light: 'Clair', language: 'Langue',
+    shortcuts: 'Raccourcis', kHint: 'Indices on/off', kCoach: 'Coach on/off', kCheck: 'Vérif gaffes on/off', kAuto: 'Auto on/off', kMenu: 'Afficher / masquer le menu', kModes: 'Modes (dans le menu)',
+    reset: 'Réinitialiser', version: 'Version', botsOnly: 'Fonctionne uniquement contre les bots chess.com.',
+    tPlay: 'Jouer', tReview: 'Bilan', tEngine: 'Moteur', tDisplay: 'Affichage', tAbout: 'Infos', minimize: 'Réduire dans la barre latérale'
+  }
+};
