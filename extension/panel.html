@@ -36,9 +36,9 @@
     <!-- PLAY -->
     <section class="view on" data-view="play">
       <div class="seg" id="mode">
-        <button data-v="off" class="c-slate"><span class="ico"><svg><use href="#i-off"/></svg></span>Off</button>
-        <button data-v="highlight" class="c-butter"><span class="ico"><svg><use href="#i-target"/></svg></span>Hint</button>
-        <button data-v="auto" class="c-rose"><span class="ico"><svg><use href="#i-bolt"/></svg></span>Auto</button>
+        <button data-v="off" class="c-slate" title="Pause (1)"><span class="ico"><svg><use href="#i-off"/></svg></span>Off</button>
+        <button data-v="highlight" class="c-butter" title="Show hints (2 · Alt+H)"><span class="ico"><svg><use href="#i-target"/></svg></span>Hint</button>
+        <button data-v="auto" class="c-rose" title="Auto-play (3 · Alt+A)"><span class="ico"><svg><use href="#i-bolt"/></svg></span>Auto</button>
       </div>
 
       <div class="hero">
@@ -47,18 +47,21 @@
           <b class="mono" id="best">—</b>
         </div>
         <div class="stats">
-          <div class="stat c-sky"><span class="ico"><svg><use href="#i-bar"/></svg></span><div><small>Eval</small><b class="mono" id="eval">—</b></div></div>
+          <div class="stat c-sky"><span class="ico"><svg><use href="#i-bar"/></svg></span><div><small id="evalTxt">Eval</small><b class="mono" id="eval">—</b></div></div>
           <div class="stat c-lilac"><span class="ico"><svg><use href="#i-layers"/></svg></span><div><small>Depth</small><b class="mono" id="dep">—</b></div></div>
         </div>
         <div class="meter" title="Evaluation (White's view)"><i id="meter"></i></div>
       </div>
 
-      <div class="section-h"><span class="ico c-mint"><svg><use href="#i-list"/></svg></span>Top lines</div>
-      <ol id="lines"><li class="empty">Waiting for your turn…</li></ol>
+      <div class="lines-block">
+        <div class="section-h"><span class="ico c-mint"><svg><use href="#i-list"/></svg></span>Top lines</div>
+        <ol id="lines"><li class="empty">Waiting for your turn…</li></ol>
+      </div>
 
-      <div class="card field">
+      <div class="card field delay-card">
         <div class="lbl"><span class="ico c-peach"><svg><use href="#i-clock"/></svg></span><span>Move delay</span><b id="delayV"></b></div>
         <input type="range" id="delay" min="0" max="10000" step="100" class="r-peach">
+        <p class="hint">Wait time before each auto move.</p>
       </div>
     </section>
 
@@ -68,8 +71,8 @@
         <div class="lbl"><span class="ico c-butter"><svg><use href="#i-trophy"/></svg></span><span>Strength</span><b id="eloV"></b></div>
         <input type="range" id="elo" min="1320" max="3190" step="10" class="r-butter">
         <div class="presets">
-          <button data-elo="1400">Casual</button><button data-elo="1900">Club</button>
-          <button data-elo="2500">Master</button><button data-elo="3190">Max</button>
+          <button data-elo="1400">Casual<small>1400</small></button><button data-elo="1900">Club<small>1900</small></button>
+          <button data-elo="2500">Master<small>2500</small></button><button data-elo="3190">Max<small>3190</small></button>
         </div>
       </div>
       <div class="card field">
@@ -98,6 +101,7 @@
         <li><span>Toggle hints</span><kbd>Alt</kbd><kbd>H</kbd></li>
         <li><span>Toggle auto-play</span><kbd>Alt</kbd><kbd>A</kbd></li>
         <li><span>Show / hide menu</span><kbd>Alt</kbd><kbd>D</kbd></li>
+        <li><span>Off · Hint · Auto (in menu)</span><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd></li>
       </ul>
       <button class="ghost" id="reset"><svg><use href="#i-reset"/></svg>Reset settings</button>
       <p class="foot">🍩 Version <span id="ver"></span> · Works against chess.com bots only.</p>

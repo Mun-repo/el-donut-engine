@@ -158,3 +158,13 @@ kbd{font:650 12px var(--font);min-width:30px;text-align:center;padding:4px 8px;b
 .tabs button:hover{color:var(--text-2)}
 .tabs button.on{color:var(--text);background:rgba(255,255,255,.12);box-shadow:inset 0 1px 0 rgba(255,255,255,.2),inset 0 0 0 1px rgba(255,255,255,.1)}
 .tabs button.on .ico{color:var(--c)}
+
+/* ergonomics: show only what matters for the current state */
+.lines-block{display:flex;flex-direction:column;gap:12px}
+body[data-lines="1"] .lines-block{display:none}
+body:not([data-mode=auto]) .delay-card{display:none}
+body[data-mode=off] .hero{opacity:.55;filter:saturate(.6)}
+.hero{transition:opacity .3s var(--ease),filter .3s var(--ease)}
+.presets button{display:flex;flex-direction:column;align-items:center;line-height:1.15;padding:7px 0}
+.presets button small{font-size:10.5px;font-weight:600;opacity:.6;font-variant-numeric:tabular-nums}
+#evalTxt{white-space:nowrap}

@@ -23,7 +23,7 @@ engine.onmessage = ({ data: l }) => {
   else if (l.startsWith('bestmove') && current) {
     const best = l.split(' ')[1];
     $('best').textContent = pretty(best); $('best').classList.remove('wait');
-    $('eval').textContent = fmtEval(info.eval, current); meter(fmtEval(info.eval, current));
+    const ev = fmtEval(info.eval, current); $('eval').textContent = ev; meter(ev); $('evalTxt').textContent = said(ev);
     const pvs = (info.pvs || []).filter(Boolean).slice(0, S.lines);
     $('lines').innerHTML = pvs.length ? pvs.map((v, i) => `<li><span>${i + 1}</span><b>${pretty(v.move)}</b><em class="${tone(v.eval)}">${v.eval}</em></li>`).join('') : '<li class="empty">No legal moves</li>';
     parent.postMessage({ type: 'best', fen: current, best, pvs, eval: fmtEval(info.eval, current) }, PARENT);
@@ -32,6 +32,8 @@ engine.onmessage = ({ data: l }) => {
 // UI-only helpers: "e2e4" → "e2 → e4", eval tone, white-advantage meter
 const pretty = m => m && m.length >= 4 ? m.slice(0, 2) + ' → ' + m.slice(2, 4) + (m[4] ? '=' + m[4].toUpperCase() : '') : (m || '—');
 const tone = e => !e || e === '—' ? '' : e[0] === 'M' ? (e[1] === '-' ? 'neg' : 'pos') : parseFloat(e) > 0.3 ? 'pos' : parseFloat(e) < -0.3 ? 'neg' : '';
+const said = e => !e || e === '—' ? 'Eval' : e[0] === 'M' ? 'Forced mate' :
+  Math.abs(parseFloat(e)) < 0.3 ? 'Equal' : (parseFloat(e) > 0 ? 'White ' : 'Black ') + (Math.abs(parseFloat(e)) < 1.5 ? 'better' : 'winning');
 function meter(e) {
   let p = 50;
   if (e && e !== '—') p = e[0] === 'M' ? (e[1] === '-' ? 2 : 98) : 50 + 50 * Math.tanh(parseFloat(e) / 4);
@@ -76,6 +78,7 @@ function render() {
   $('linesV').textContent = S.lines;
   $('arrows').checked = S.arrows; $('evalbar').checked = S.evalbar;
   $('jitter').checked = S.jitter;
+  document.body.dataset.mode = S.mode; document.body.dataset.lines = S.lines;
   document.querySelectorAll('.presets button').forEach(b => b.classList.toggle('on', +b.dataset.elo === S.elo));
   status();
 }
@@ -94,6 +97,10 @@ document.querySelectorAll('.presets button').forEach(b => b.onclick = () => set(
 document.querySelectorAll('.tabs button').forEach(t => t.onclick = () => {
   document.querySelectorAll('.tabs button').forEach(x => x.classList.toggle('on', x === t));
   document.querySelectorAll('.view').forEach(v => v.classList.toggle('on', v.dataset.view === t.dataset.tab));
+});
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' && e.target.type !== 'checkbox' && e.target.type !== 'range') return;
+  const m = { '1': 'off', '2': 'highlight', '3': 'auto' }[e.key]; if (m && !e.altKey && !e.ctrlKey && !e.metaKey) set({ mode: m });
 });
 $('reset').onclick = () => set({ ...DEF });
 $('ver').textContent = chrome.runtime.getManifest().version;
