@@ -22,12 +22,21 @@ engine.onmessage = ({ data: l }) => {
   }
   else if (l.startsWith('bestmove') && current) {
     const best = l.split(' ')[1];
-    $('best').textContent = best; $('eval').textContent = fmtEval(info.eval, current);
+    $('best').textContent = pretty(best); $('best').classList.remove('wait');
+    $('eval').textContent = fmtEval(info.eval, current); meter(fmtEval(info.eval, current));
     const pvs = (info.pvs || []).filter(Boolean).slice(0, S.lines);
-    $('lines').innerHTML = pvs.length ? pvs.map((v, i) => `<li><span>${i + 1}</span><b>${v.move}</b><em>${v.eval}</em></li>`).join('') : '<li class="empty">No legal moves</li>';
+    $('lines').innerHTML = pvs.length ? pvs.map((v, i) => `<li><span>${i + 1}</span><b>${pretty(v.move)}</b><em class="${tone(v.eval)}">${v.eval}</em></li>`).join('') : '<li class="empty">No legal moves</li>';
     parent.postMessage({ type: 'best', fen: current, best, pvs, eval: fmtEval(info.eval, current) }, PARENT);
   }
 };
+// UI-only helpers: "e2e4" → "e2 → e4", eval tone, white-advantage meter
+const pretty = m => m && m.length >= 4 ? m.slice(0, 2) + ' → ' + m.slice(2, 4) + (m[4] ? '=' + m[4].toUpperCase() : '') : (m || '—');
+const tone = e => !e || e === '—' ? '' : e[0] === 'M' ? (e[1] === '-' ? 'neg' : 'pos') : parseFloat(e) > 0.3 ? 'pos' : parseFloat(e) < -0.3 ? 'neg' : '';
+function meter(e) {
+  let p = 50;
+  if (e && e !== '—') p = e[0] === 'M' ? (e[1] === '-' ? 2 : 98) : 50 + 50 * Math.tanh(parseFloat(e) / 4);
+  $('meter').style.width = p + '%';
+}
 function fmtEval(e, fen) {
   if (!e) return '—';
   if (e[0] === 'M') return e;
@@ -45,7 +54,7 @@ window.addEventListener('message', e => {
   if (e.origin !== PARENT) return;
   if (e.data?.type === 'analyse' && engineOk) {
     current = e.data.fen; info = {};
-    $('best').textContent = '…';
+    $('best').textContent = 'thinking…'; $('best').classList.add('wait');
     uci('stop'); uci('position fen ' + current); uci('go depth ' + S.depth);
   }
 });
