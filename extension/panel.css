@@ -49,6 +49,7 @@ h1{font:650 15px/1.15 var(--display);letter-spacing:-.015em}
 .title p{display:flex;align-items:center;gap:7px;margin-top:2px;font-size:11.5px;color:var(--text-2)}
 .dot{width:6px;height:6px;border-radius:50%;background:var(--text-3);transition:background .3s}
 .dot.ok{background:var(--good)}
+.dot.bad{background:var(--bad)}
 .dot.live{background:var(--accent);box-shadow:0 0 0 3px var(--accent-wash)}
 .icon-btn{width:30px;height:30px;display:grid;place-items:center;border-radius:9px;color:var(--text-2);transition:.15s}
 .icon-btn:hover{background:var(--s2);color:var(--text)}

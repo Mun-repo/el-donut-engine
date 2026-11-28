@@ -9,6 +9,10 @@ const t = k => (I18N[S.lang] || I18N.en)[k] ?? I18N.en[k] ?? k;
 
 // ---------- Engine ----------
 const engine = new Worker('engine/stockfish.js');
+let engineFailed = false;
+const engineFail = () => { if (engineOk || engineFailed) return; engineFailed = true; status(); };
+engine.onerror = engineFail;                       // WASM blocked / file missing
+setTimeout(engineFail, 15000);                     // never answered
 const uci = c => engine.postMessage(c);
 engine.onmessage = ({ data: l }) => {
   if (typeof l !== 'string') return;
@@ -137,8 +141,8 @@ function translate() {
 }
 const status = () => {
   const key = { off: 'sOff', highlight: 'sHighlight', coach: 'sCoach', check: 'sCheck', auto: 'sAuto' }[S.mode];
-  $('status').textContent = engineOk ? t(key) : t('sLoading');
-  $('dot').className = 'dot' + (engineOk ? (S.mode === 'off' ? ' ok' : ' live') : '');
+  $('status').textContent = engineOk ? t(key) : engineFailed ? t('sFail') : t('sLoading');
+  $('dot').className = 'dot' + (engineOk ? (S.mode === 'off' ? ' ok' : ' live') : engineFailed ? ' bad' : '');
 };
 let lang = null;
 function render() {
