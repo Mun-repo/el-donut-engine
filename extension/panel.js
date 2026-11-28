@@ -9,10 +9,10 @@ const t = k => (I18N[S.lang] || I18N.en)[k] ?? I18N.en[k] ?? k;
 
 // ---------- Engine ----------
 const engine = new Worker('engine/stockfish.js');
-let engineFailed = false;
-const engineFail = () => { if (engineOk || engineFailed) return; engineFailed = true; status(); };
-engine.onerror = engineFail;                       // WASM blocked / file missing
-setTimeout(engineFail, 15000);                     // never answered
+let engineFailed = false, failMsg = '';
+const engineFail = msg => { if (engineOk || engineFailed) return; engineFailed = true; failMsg = msg || 'No response from the engine after 15 s.'; render(); };
+engine.onerror = e => { e.preventDefault?.(); engineFail(String(e.message || e.filename || 'Worker error').replace(/^Uncaught\s*/, '')); };   // WASM blocked / file missing
+setTimeout(() => engineFail(), 15000);             // never answered
 const uci = c => engine.postMessage(c);
 engine.onmessage = ({ data: l }) => {
   if (typeof l !== 'string') return;
@@ -151,7 +151,8 @@ function render() {
   if (lang !== S.lang) { lang = S.lang; translate(); renderReview(reviewData); }
   $$('#mode button').forEach(b => b.classList.toggle('on', b.dataset.v === S.mode));
   const md = S.mode[0].toUpperCase() + S.mode.slice(1);
-  $('modeDesc').textContent = t('d' + md);
+  $('modeDesc').textContent = engineFailed ? failMsg.slice(0, 220) : t('d' + md);
+  $('modeDesc').classList.toggle('err', engineFailed);
   for (const k of ['elo', 'delay', 'depth', 'linesR']) {
     const el = $(k), v = S[k === 'linesR' ? 'lines' : k]; el.value = v;
     el.style.setProperty('--p', ((v - el.min) / (el.max - el.min) * 100) + '%');
